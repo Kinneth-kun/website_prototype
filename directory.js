@@ -48,13 +48,35 @@ const renderFilterGroup = (container, values, type) => {
 };
 
 const matchesTenant = (tenant) => {
-  const haystack = normalize(`${tenant.name} ${tenant.category}`);
+  const haystack = normalize(`${tenant.name} ${tenant.category} ${tenant.location || ""}`);
   const matchesQuery = !state.query || haystack.includes(normalize(state.query));
   const matchesCategory = state.category === "All" || tenant.category === state.category;
   return matchesQuery && matchesCategory;
 };
 
-const featuredNames = new Set(tenants.filter((tenant) => tenant.logo).map((tenant) => tenant.name));
+const featuredNames = new Set([
+  "Cebuana Lhuillier",
+  "Core Pacific",
+  "RD Pawnshop",
+  "Robinson's Supermarket",
+  "Security Bank",
+  "Southstar Drugstore",
+  "Executive Optical",
+  "Goldilocks",
+  "Leylam",
+  "Master Siomai",
+  "Thirsty",
+  "National Bookstore",
+  "Royal Spoon Inc. (Jollibee)",
+  "Kuya J",
+  "Timezone",
+  "McDonald's",
+  "Watsons",
+  "ZUS Coffee",
+  "Ace Hardware",
+  "Penshoppe",
+  "Regatta",
+]);
 
 const renderTenantCard = (tenant, index) => {
   const article = document.createElement("article");
@@ -76,6 +98,7 @@ const renderTenantCard = (tenant, index) => {
       </div>
       <h3>${tenant.name}</h3>
       <span class="tenant-category-line">${tenant.category}</span>
+      <span class="tenant-location">${tenant.location || "Location to be confirmed"}</span>
       <p>${getTenantDescription(tenant)}</p>
       <a class="tenant-action" href="inquire.html">View details</a>
     </div>
@@ -102,7 +125,7 @@ const getTenantDescription = (tenant) => {
 const updateMetrics = (filteredTenants) => {
   if (totalTenants) totalTenants.textContent = tenants.length;
   if (totalCategories) totalCategories.textContent = new Set(tenants.map((tenant) => tenant.category)).size;
-  if (totalFeatured) totalFeatured.textContent = tenants.filter((tenant) => tenant.logo).length;
+  if (totalFeatured) totalFeatured.textContent = tenants.filter((tenant) => featuredNames.has(tenant.name)).length;
   if (resultCount) resultCount.textContent = filteredTenants.length;
 };
 
