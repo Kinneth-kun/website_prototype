@@ -44,26 +44,26 @@
         </div>
         <div class="available-spaces-toolbar" aria-label="Available spaces controls">
           <div class="space-tabs" aria-label="Space type filters">
-            <button class="active" type="button">All</button>
-            <button type="button">Retail</button>
-            <button type="button">Dining</button>
-            <button type="button">Services</button>
+            <button class="active" type="button" data-space-filter="All">All</button>
+            <button type="button" data-space-filter="Retail">Retail</button>
+            <button type="button" data-space-filter="Dining">Dining</button>
+            <button type="button" data-space-filter="Service">Services</button>
           </div>
           <label class="space-search">
             <span>Search spaces</span>
-            <input type="search" placeholder="Search spaces..." />
+            <input type="search" placeholder="Search spaces..." data-space-search />
           </label>
-          <button class="space-filter-button" type="button"><span aria-hidden="true"></span>Filters</button>
-          <select class="space-sort" aria-label="Sort available spaces">
-            <option>Newest</option>
-            <option>Largest first</option>
-            <option>Retail spaces</option>
+          <button class="space-filter-button" type="button" data-space-clear><span aria-hidden="true"></span>Clear</button>
+          <select class="space-sort" aria-label="Sort available spaces" data-space-sort>
+            <option value="default">Featured order</option>
+            <option value="name">Name A-Z</option>
+            <option value="type">Space type</option>
           </select>
-          <p class="space-count">3 spaces</p>
+          <p class="space-count" data-space-count>3 spaces</p>
         </div>
         <div class="available-spaces-photo" role="img" aria-label="Island Central Mactan mall exterior"></div>
-        <div class="available-spaces-list">
-          <article class="available-space-listing">
+        <div class="available-spaces-list" data-space-results>
+          <article class="available-space-listing" data-space-card data-space-type="Retail" data-space-name="Retail Storefront Space at Island Central Mactan" data-space-keywords="ground floor retail storefront showroom wellness convenience mall-facing high visibility">
             <figure class="space-listing-photo">
               <img src="images/mall_images/001.png" alt="Island Central Mactan retail frontage" />
             </figure>
@@ -83,12 +83,12 @@
             <aside class="space-listing-side">
               <div class="space-badges"><span>Retail</span><span>Available</span></div>
               <details>
-                <summary>Features & Amenities</summary>
+                <summary>Features &amp; Amenities</summary>
                 <ul><li>Strong frontage potential</li><li>Easy customer access</li><li>Professional mall setting</li></ul>
               </details>
             </aside>
           </article>
-          <article class="available-space-listing">
+          <article class="available-space-listing" data-space-card data-space-type="Dining" data-space-name="Food and Beverage Space for Dining Concepts" data-space-keywords="food zone dining cafe dessert kiosk quick-service restaurant snacks beverage internal access">
             <figure class="space-listing-photo">
               <img src="images/mall_images/002.png" alt="Island Central Mactan mall interior" />
             </figure>
@@ -98,7 +98,7 @@
               <dl class="space-facts">
                 <div><dt>Format</dt><dd>Dining</dd></div>
                 <div><dt>Condition</dt><dd>Fit-out Ready</dd></div>
-                <div><dt>Audience</dt><dd>Workers & families</dd></div>
+                <div><dt>Audience</dt><dd>Workers &amp; families</dd></div>
               </dl>
               <div class="space-tags"><span>Commercial / Food Space</span><span>Fit-out Ready</span></div>
               <p>Space suited for cafes, quick-service dining, dessert shops, snack counters, and grab-and-go concepts serving workers, travelers, and nearby communities.</p>
@@ -108,12 +108,12 @@
             <aside class="space-listing-side">
               <div class="space-badges"><span>Dining</span><span>Available</span></div>
               <details>
-                <summary>Features & Amenities</summary>
+                <summary>Features &amp; Amenities</summary>
                 <ul><li>Repeat-visit potential</li><li>Compact operations</li><li>Airport-adjacent demand</li></ul>
               </details>
             </aside>
           </article>
-          <article class="available-space-listing">
+          <article class="available-space-listing" data-space-card data-space-type="Service" data-space-name="Service-ready Unit for Everyday Customer Needs" data-space-keywords="mall level service clinic salon repair payment center travel desk wellness errands flexible layout">
             <figure class="space-listing-photo">
               <img src="images/mall_images/003.png" alt="Island Central Mactan commercial interior" />
             </figure>
@@ -133,12 +133,13 @@
             <aside class="space-listing-side">
               <div class="space-badges"><span>Service</span><span>Available</span></div>
               <details>
-                <summary>Features & Amenities</summary>
+                <summary>Features &amp; Amenities</summary>
                 <ul><li>Flexible fit-out</li><li>Useful for daily errands</li><li>Managed commercial environment</li></ul>
               </details>
             </aside>
           </article>
         </div>
+        <p class="space-empty" data-space-empty hidden>No available spaces match your current search.</p>
       </section>
 
       <section class="section leasing-spaces-section" id="leasing-spaces">
@@ -196,7 +197,7 @@
     <footer class="site-footer">
       <div class="footer-main">
         <div class="footer-column"><h2>Discover Your Hub</h2><a href="mall.html">The Mall</a><a href="services.html">Services</a><a href="leasing.html">Leasing Spaces</a><a href="about.html">About Island Central</a></div>
-        <div class="footer-column"><h2>Connect & Curate</h2><a href="leasing.html">Retail Leasing</a><a href="leasing.html">Dining Leasing</a><a href="inquire.html">Contact Us</a><a href="index.html">Back to Home</a></div>
+        <div class="footer-column"><h2>Connect &amp; Curate</h2><a href="leasing.html">Retail Leasing</a><a href="leasing.html">Dining Leasing</a><a href="inquire.html">Contact Us</a><a href="index.html">Back to Home</a></div>
         <div class="footer-brand"><img src="images/general_images/icm_logo_transparent.png" alt="Island Central Mactan logo" /><p>Mactan's premier destination</p><div class="social-links" aria-label="Social links">
   <a href="https://www.facebook.com/islandcentralmactanofficial" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 8.4V6.8c0-.8.2-1.3 1.4-1.3H17V2.6c-.8-.1-1.7-.2-2.5-.2-2.6 0-4.4 1.6-4.4 4.5v1.5H7.2v3.3h2.9v8.9H14v-8.9h2.8l.4-3.3H14Z" /></svg>

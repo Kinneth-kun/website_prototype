@@ -538,10 +538,20 @@ a {
   border-bottom: 1px solid var(--line);
 }
 
+.mall-hours-strip {
+  grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
+}
+
 .quick-info article {
   min-height: 170px;
   padding: clamp(24px, 4vw, 44px);
   background: #fff;
+}
+
+.live-hours-card {
+  background:
+    linear-gradient(135deg, rgba(0, 140, 153, 0.08), rgba(244, 191, 42, 0.12)),
+    #fff;
 }
 
 .quick-info span {
@@ -553,6 +563,12 @@ a {
   display: block;
   margin-top: 12px;
   font-size: 1.18rem;
+}
+
+.live-hours-card strong {
+  color: var(--teal-dark);
+  font-size: clamp(1.7rem, 3vw, 2.7rem);
+  line-height: 1.05;
 }
 
 .quick-info p,
@@ -1469,6 +1485,8 @@ a {
 
 .directory-card {
   position: relative;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
   min-height: 230px;
   padding: 28px;
@@ -1501,10 +1519,32 @@ a {
 }
 
 .directory-card > a:not(.button) {
-  display: inline-block;
-  margin-top: 12px;
+  display: inline-flex;
+  align-items: center;
+  width: 100%;
+  min-height: 40px;
+  margin-top: auto;
+  padding-top: 18px;
   color: var(--teal-dark);
   font-weight: 800;
+  line-height: 1.2;
+  border-top: 1px solid transparent;
+  transition:
+    color 180ms ease,
+    border-color 180ms ease,
+    transform 180ms ease;
+}
+
+.directory-card:hover > a:not(.button),
+.directory-card > a:not(.button):focus-visible {
+  color: var(--teal);
+  border-top-color: rgba(0, 140, 153, 0.24);
+}
+
+.directory-card > a:not(.button):focus-visible {
+  outline: 3px solid rgba(244, 191, 42, 0.48);
+  outline-offset: 4px;
+  border-radius: 4px;
 }
 
 .directory-hover {
@@ -1658,6 +1698,17 @@ a {
   line-height: 1.18;
 }
 
+.event-date {
+  margin: -8px 0 12px !important;
+  color: #526173 !important;
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.event-featured .event-date {
+  color: rgba(255, 255, 255, 0.78) !important;
+}
+
 .event-card p {
   margin: 0;
   color: var(--muted);
@@ -1673,6 +1724,10 @@ a {
   color: var(--teal-dark);
   font-weight: 800;
   border-bottom: 2px solid var(--gold);
+}
+
+.event-featured a {
+  color: #fff;
 }
 
 .promo-calendar-section {
@@ -1712,6 +1767,47 @@ a {
 .promo-list p {
   margin: 0;
   color: var(--muted);
+}
+
+.promo-list a {
+  display: inline-block;
+  margin-top: 18px;
+  color: var(--teal-dark);
+  font-weight: 800;
+  border-bottom: 2px solid var(--gold);
+}
+
+.promo-partner-section {
+  padding-top: 0;
+  background: var(--soft);
+}
+
+.promo-partner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: clamp(28px, 5vw, 46px);
+  color: #fff;
+  background:
+    linear-gradient(135deg, rgba(0, 98, 112, 0.96), rgba(16, 24, 38, 0.96)),
+    linear-gradient(90deg, rgba(244, 191, 42, 0.16), transparent 44%);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+
+.promo-partner h2 {
+  max-width: 680px;
+  color: #fff;
+  font-size: clamp(2rem, 3.3vw, 3.5rem);
+}
+
+.promo-partner p:not(.eyebrow) {
+  max-width: 720px;
+  margin: 16px 0 0;
+  color: rgba(255, 255, 255, 0.82);
 }
 
 .leasing-section {
@@ -2033,6 +2129,19 @@ a {
   color: #8a96a5;
   font-weight: 800;
   white-space: nowrap;
+}
+
+.space-empty {
+  width: min(1288px, calc(100% - 40px));
+  margin: 18px auto 0;
+  padding: 28px;
+  color: var(--muted);
+  font-weight: 700;
+  text-align: center;
+  background: #fff;
+  border: 1px solid rgba(17, 20, 22, 0.08);
+  border-radius: 8px;
+  box-shadow: 0 14px 32px rgba(18, 40, 48, 0.08);
 }
 
 .available-spaces-photo {
@@ -2553,6 +2662,8 @@ a {
 
 .services-grid article {
   position: relative;
+  display: flex;
+  flex-direction: column;
   isolation: isolate;
   overflow: hidden;
   padding: 26px;
@@ -2595,7 +2706,20 @@ a {
   color: #fff;
   background: var(--teal);
   border-radius: 6px;
-  font-weight: 900;
+}
+
+.icon svg {
+  width: 23px;
+  height: 23px;
+  fill: currentColor;
+}
+
+.service-card-media {
+  min-height: 158px;
+  margin: -26px -26px 24px;
+  background:
+    linear-gradient(180deg, rgba(5, 6, 12, 0.08), rgba(5, 6, 12, 0.36)),
+    #08090e url("images/general_images/cinema_background.png") center/cover no-repeat;
 }
 
 .services-grid h3 {
@@ -2606,7 +2730,8 @@ a {
   display: inline-flex;
   align-items: center;
   width: fit-content;
-  margin-top: 14px;
+  margin-top: auto;
+  padding-top: 18px;
   color: var(--teal-dark);
   font-weight: 800;
   border-bottom: 2px solid var(--gold);
@@ -2741,6 +2866,12 @@ a {
   width: 100%;
   border: 0;
   cursor: pointer;
+}
+
+.form-note {
+  margin: -4px 0 0;
+  color: var(--muted);
+  font-size: 0.86rem;
 }
 
 .contact-info-section {
@@ -3229,6 +3360,11 @@ a {
     margin-top: 18px;
     opacity: 1;
     transform: none;
+  }
+
+  .promo-partner {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .directory-toolbar {

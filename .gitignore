@@ -1,0 +1,4 @@
+cloudflared.exe
+stdout
+localhost-run*.log
+known_hosts.localhost_run
