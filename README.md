@@ -40,9 +40,9 @@ MAIL_MAILER=smtp
 MAIL_SCHEME=null
 MAIL_HOST=smtp.gmail.com
 MAIL_PORT=587
-MAIL_USERNAME=kinnethdaluag2004@gmail.com
+MAIL_USERNAME=sample@gmail.com
 MAIL_PASSWORD=your-16-character-google-app-password
-MAIL_FROM_ADDRESS=kinnethdaluag2004@gmail.com
+MAIL_FROM_ADDRESS=sample@gmail.com
 MAIL_FROM_NAME="Island Central Mactan"
 ```
 
