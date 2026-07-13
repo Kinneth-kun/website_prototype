@@ -18,6 +18,7 @@ class PublicController extends Controller
         $version=Cache::get('cms_content_version',1); $cacheKey='public-content:'.$version.':'.$resource.':'.sha1($request->getQueryString()??'');
         $content=Cache::remember($cacheKey,60,function() use($request,$resource){
         $query = DB::table($resource);
+        if ($resource === 'categories') $query->where('is_active', true);
         if (in_array($resource, ['tenants','leasing_spaces','events','promotions','services','highlights'], true)) {
             $query->whereNull('deleted_at');
             if (\Illuminate\Support\Facades\Schema::hasColumn($resource, 'published_at')) $query->where(fn($q)=>$q->whereNull('published_at')->orWhere('published_at','<=',now()));

@@ -108,3 +108,19 @@ Backups are private files under `backend/storage/app/private/backups`. Copy them
 - Configure HTTPS, response compression, security headers, and long-lived caching for versioned assets at the web server or CDN.
 - Set up database/off-site backups, uptime checks for `/up`, and application error monitoring.
 - Update canonical URLs and submit the deployed sitemap through the search-engine webmaster tools after the final domain is known.
+
+## Deploying the frontend to Vercel
+
+The repository includes Vercel configurations for either supported project setup:
+
+- Repository root selected in Vercel: use the root `vercel.json` and leave **Root Directory** empty.
+- `frontend` selected as the Vercel Root Directory: Vercel uses `frontend/vercel.json`.
+
+Do not set the Root Directory to `backend`; Laravel must be hosted on a PHP-capable server. In the Vercel project settings, add these production environment variables:
+
+```env
+VITE_API_URL=https://your-deployed-laravel-domain.example/api
+VITE_SITE_URL=https://website-prototype-livid.vercel.app
+```
+
+After saving environment variables, redeploy the latest commit. The rewrite rule sends React routes such as `/directory`, `/about`, and `/admin` to `index.html` instead of returning a Vercel 404.

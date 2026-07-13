@@ -25,6 +25,7 @@ class AdminResourceController extends Controller
             $column = Schema::hasColumn($table, 'name') ? 'name' : (Schema::hasColumn($table, 'title') ? 'title' : null);
             if ($column) $query->where($column, 'like', '%'.$request->string('search').'%');
         }
+        if ($table === 'tenants' && $request->filled('category_id')) $query->where('category_id', $request->integer('category_id'));
         return $query->orderByDesc('id')->paginate(min($request->integer('per_page', 25), 100));
     }
 
@@ -75,7 +76,7 @@ class AdminResourceController extends Controller
     private function validateData(string $table, array $data, ?int $id = null, bool $partial = false): void
     {
         $rules = [
-            'tenants'=>['name'=>['required','string','max:190'],'slug'=>['nullable','string','max:190',Rule::unique('tenants','slug')->ignore($id)],'email'=>['nullable','email','max:190'],'website_url'=>['nullable','url','max:500'],'status'=>['nullable',Rule::in(['active','inactive','draft'])]],
+            'tenants'=>['name'=>['required','string','max:190'],'category_id'=>['required','integer','exists:categories,id'],'slug'=>['nullable','string','max:190',Rule::unique('tenants','slug')->ignore($id)],'email'=>['nullable','email','max:190'],'website_url'=>['nullable','url','max:500'],'status'=>['nullable',Rule::in(['active','inactive','draft'])]],
             'categories'=>['name'=>['required','string','max:120'],'display_order'=>['nullable','integer','min:0']],
             'floors'=>['name'=>['required','string','max:120'],'floor_number'=>['nullable','integer'],'display_order'=>['nullable','integer','min:0']],
             'leasing_spaces'=>['title'=>['required','string','max:190'],'space_type'=>['required','string','max:80'],'description'=>['required','string','max:5000'],'area_sqm'=>['nullable','numeric','min:0'],'cover_image_url'=>['nullable','string','max:1000']],
