@@ -36,7 +36,7 @@ class AuthController extends Controller
 
     public function verifyOtp(Request $request)
     {
-        $data = $request->validate(['challenge_id' => ['required','uuid'], 'code' => ['required','digits:6']]);
+        $data = $request->validate(['challenge_id' => ['required','uuid'], 'code' => ['required','digits:6'], 'remember' => ['sometimes','boolean']]);
         return DB::transaction(function () use ($data, $request) {
             $challenge = DB::table('admin_login_otps')->where('id', $data['challenge_id'])->lockForUpdate()->first();
             if (! $challenge || $challenge->consumed_at || now()->greaterThan($challenge->expires_at) || $challenge->attempts >= 5) {
@@ -52,15 +52,19 @@ class AuthController extends Controller
             $user = User::whereKey($challenge->user_id)->where('status', 'active')->first();
             if (! $user) return response()->json(['message' => 'This verification code is invalid or has expired.'], 422);
             $token = Str::random(80); $sessionId = (string) Str::uuid();
+            $remember = (bool) ($data['remember'] ?? false);
+            $expiresAt = $remember
+                ? now()->addDays(max(1, (int) env('ADMIN_REMEMBER_SESSION_DAYS', 30)))
+                : now()->addHours(max(1, (int) env('ADMIN_SESSION_HOURS', 8)));
             DB::table('admin_login_otps')->where('id', $challenge->id)->update(['consumed_at' => now(), 'updated_at' => now()]);
             DB::table('admin_sessions')->insert([
-                'id'=>$sessionId, 'user_id'=>$user->id, 'token_hash'=>hash('sha256', $token),
+                'id'=>$sessionId, 'user_id'=>$user->id, 'token_hash'=>hash('sha256', $token), 'remembered'=>$remember,
                 'ip_address'=>$request->ip(), 'user_agent'=>Str::limit((string)$request->userAgent(), 1000, ''),
-                'last_used_at'=>now(), 'expires_at'=>now()->addHours((int) env('ADMIN_SESSION_HOURS', 8)),
+                'last_used_at'=>now(), 'expires_at'=>$expiresAt,
                 'created_at'=>now(), 'updated_at'=>now(),
             ]);
             $user->update(['api_token_hash' => null, 'last_login_at' => now()]);
-            return response()->json(['token' => $token, 'expires_in' => (int) env('ADMIN_SESSION_HOURS', 8) * 3600, 'user' => $user->only('id','name','email','role')]);
+            return response()->json(['token' => $token, 'remembered' => $remember, 'expires_in' => now()->diffInSeconds($expiresAt), 'user' => $user->only('id','name','email','role')]);
         });
     }
 

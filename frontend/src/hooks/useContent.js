@@ -6,15 +6,22 @@ export function useContent(resource) {
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     let active = true;
-    setLoading(true);
-    api(`/content/${resource}`).then(value => active && setData(value)).finally(() => active && setLoading(false));
-    return () => { active = false; };
+    const load = () => { setLoading(true); api(`/content/${resource}`).then(value => active && setData(value)).finally(() => active && setLoading(false)); };
+    load();
+    window.addEventListener("icm:content-updated", load);
+    return () => { active = false; window.removeEventListener("icm:content-updated", load); };
   }, [resource]);
   return [data, loading];
 }
 
 export function useSettings() {
   const [settings, setSettings] = useState({});
-  useEffect(() => { api("/content/settings").then(setSettings); }, []);
+  useEffect(() => {
+    let active = true;
+    const load = () => api("/content/settings").then(value => active && setSettings(value));
+    load();
+    window.addEventListener("icm:content-updated", load);
+    return () => { active = false; window.removeEventListener("icm:content-updated", load); };
+  }, []);
   return settings;
 }

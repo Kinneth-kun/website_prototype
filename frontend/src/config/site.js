@@ -27,7 +27,7 @@ export const adminResources = [
 ];
 
 export const adminFields = {
-  tenants: ["name","category_id","location_detail","lease_type","logo_url","description","status","is_featured"],
+  tenants: ["trade_name","industry_name","company_address","email_address","nature_of_business","approved_products","picture_of_branches","picture_of_menu"],
   categories: ["name","description"], floors: ["name","floor_number","description"],
   leasing_spaces: ["branch_id","unit_code","unit_name","floor_level","location_description","floor_area_sqm","status"],
   events: ["title","summary","venue","start_datetime","end_datetime","status","cover_image_url","is_featured","published_at"],

@@ -38,9 +38,26 @@ class CmsApiTest extends TestCase
         $code = null;
         Mail::assertSent(AdminLoginOtp::class, function (AdminLoginOtp $mail) use (&$code) { $code = $mail->code; return true; });
         $verification = $this->postJson('/api/admin/verify-otp', ['challenge_id'=>$login->json('challenge_id'),'code'=>$code])
-            ->assertOk()->assertJsonStructure(['token','user']);
+            ->assertOk()->assertJson(['remembered'=>false])->assertJsonStructure(['token','user']);
         $this->withToken($verification->json('token'))->getJson('/api/admin/tenants')->assertOk()->assertJsonStructure(['data']);
         $this->postJson('/api/admin/verify-otp', ['challenge_id'=>$login->json('challenge_id'),'code'=>$code])->assertUnprocessable();
+    }
+
+    public function test_remember_me_creates_a_persistent_admin_session(): void
+    {
+        Mail::fake();
+        $user=User::create(['name'=>'Remembered Administrator','email'=>'remember@example.test','password'=>Hash::make('Strong-test-password-123!'),'role'=>'super_admin','status'=>'active']);
+        $login=$this->postJson('/api/admin/login',['email'=>$user->email,'password'=>'Strong-test-password-123!'])->assertOk();
+        $code=null;
+        Mail::assertSent(AdminLoginOtp::class,function(AdminLoginOtp $mail)use(&$code){$code=$mail->code;return true;});
+
+        $verification=$this->postJson('/api/admin/verify-otp',['challenge_id'=>$login->json('challenge_id'),'code'=>$code,'remember'=>true])
+            ->assertOk()->assertJson(['remembered'=>true]);
+        $session=DB::table('admin_sessions')->where('token_hash',hash('sha256',$verification->json('token')))->first();
+
+        $this->assertTrue((bool)$session->remembered);
+        $this->assertTrue(\Illuminate\Support\Carbon::parse($session->expires_at)->greaterThan(now()->addDays(29)));
+        $this->withToken($verification->json('token'))->getJson('/api/admin/me')->assertOk();
     }
 
     public function test_otp_cannot_be_redeemed_from_a_different_ip_address(): void

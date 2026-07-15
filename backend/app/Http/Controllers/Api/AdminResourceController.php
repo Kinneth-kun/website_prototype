@@ -118,10 +118,18 @@ class AdminResourceController extends Controller
     {
         $blocked = ['id','created_at','updated_at','deleted_at','api_token_hash','password'];
         $data = collect($request->all())->only(array_diff(Schema::getColumnListing($table), $blocked))->toArray();
+        if ($table === 'tenants') $data = $this->syncTenantFields($data);
         if ($table === 'leasing_spaces') $data = $this->syncLeasingFields($data, $creating);
         if (isset($data['name']) && Schema::hasColumn($table, 'slug') && empty($data['slug'])) $data['slug'] = Str::slug($data['name']);
         if (isset($data['title']) && Schema::hasColumn($table, 'slug') && empty($data['slug'])) $data['slug'] = Str::slug($data['title']);
         foreach ($data as $key => $value) if (is_array($value)) $data[$key] = json_encode($value);
+        return $data;
+    }
+
+    private function syncTenantFields(array $data): array
+    {
+        if (array_key_exists('trade_name', $data)) $data['name'] = $data['trade_name'];
+        elseif (array_key_exists('name', $data)) $data['trade_name'] = $data['name'];
         return $data;
     }
 
@@ -189,7 +197,7 @@ class AdminResourceController extends Controller
     private function validateData(string $table, array $data, ?int $id = null, bool $partial = false): void
     {
         $rules = [
-            'tenants'=>['name'=>['required','string','max:190'],'category_id'=>['required','integer','exists:categories,id'],'slug'=>['nullable','string','max:190',Rule::unique('tenants','slug')->ignore($id)],'email'=>['nullable','email','max:190'],'website_url'=>['nullable','url','max:500'],'status'=>['nullable',Rule::in(['active','inactive','draft'])]],
+            'tenants'=>['trade_name'=>['required','string','max:190'],'industry_name'=>['nullable','string','max:190'],'company_address'=>['nullable','string','max:5000'],'email_address'=>['nullable','email','max:190'],'nature_of_business'=>['nullable','string','max:10000'],'approved_products'=>['nullable','string','max:20000'],'picture_of_branches'=>['nullable','string','max:20000'],'picture_of_menu'=>['nullable','string','max:20000'],'slug'=>['nullable','string','max:190',Rule::unique('tenants','slug')->ignore($id)]],
             'categories'=>['name'=>['required','string','max:120'],'display_order'=>['nullable','integer','min:0']],
             'floors'=>['name'=>['required','string','max:120'],'floor_number'=>['nullable','integer'],'display_order'=>['nullable','integer','min:0']],
             'leasing_spaces'=>[

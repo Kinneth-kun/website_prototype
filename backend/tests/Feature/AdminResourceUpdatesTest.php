@@ -39,6 +39,26 @@ class AdminResourceUpdatesTest extends TestCase
         ]));
     }
 
+    public function test_tenant_schema_uses_leasing_system_field_names(): void
+    {
+        $this->assertTrue(Schema::hasColumns('tenants', [
+            'id', 'trade_name', 'industry_name', 'company_address', 'email_address',
+            'nature_of_business', 'approved_products', 'picture_of_branches',
+            'picture_of_menu', 'created_at', 'updated_at',
+        ]));
+        $this->assertTrue(Schema::hasColumn('leasing_spaces', 'floor_level'));
+        $this->assertFalse(Schema::hasColumn('tenants', 'floor_level'));
+    }
+
+    public function test_public_tenants_only_expose_safe_display_fields(): void
+    {
+        $tenant = $this->getJson('/api/content/tenants')->assertOk()->json('0');
+        $this->assertSame(['trade_name', 'industry_name', 'company_address', 'approved_products', 'picture_of_branches', 'picture_of_menu'], array_keys($tenant));
+        $this->assertNotEmpty($tenant['trade_name']);
+        $this->assertArrayNotHasKey('email_address', $tenant);
+        $this->assertArrayNotHasKey('nature_of_business', $tenant);
+    }
+
     public function test_admin_can_create_and_update_a_leasing_space_with_legacy_fields_synchronized(): void
     {
         $this->authenticateAdmin();
@@ -105,6 +125,7 @@ class AdminResourceUpdatesTest extends TestCase
         DB::table('tenants')->insert([
             [
                 'name' => 'Aardvark Tenant QA',
+                'trade_name' => 'Aardvark Tenant QA',
                 'slug' => 'aardvark-tenant-qa',
                 'category_id' => $categoryId,
                 'status' => 'active',
@@ -114,6 +135,7 @@ class AdminResourceUpdatesTest extends TestCase
             ],
             [
                 'name' => 'Zyzzyva Tenant QA',
+                'trade_name' => 'Zyzzyva Tenant QA',
                 'slug' => 'zyzzyva-tenant-qa',
                 'category_id' => $categoryId,
                 'status' => 'active',
@@ -124,7 +146,7 @@ class AdminResourceUpdatesTest extends TestCase
         ]);
 
         $publicCategories = collect($this->getJson('/api/content/categories')->assertOk()->json())->pluck('name');
-        $publicTenants = collect($this->getJson('/api/content/tenants')->assertOk()->json())->pluck('name');
+        $publicTenants = collect($this->getJson('/api/content/tenants')->assertOk()->json())->pluck('trade_name');
         $this->assertLessThan($publicCategories->search('Zyzzyva QA'), $publicCategories->search('Aardvark QA'));
         $this->assertLessThan($publicTenants->search('Zyzzyva Tenant QA'), $publicTenants->search('Aardvark Tenant QA'));
 
@@ -137,6 +159,37 @@ class AdminResourceUpdatesTest extends TestCase
             ->assertOk()->assertJsonPath('data.0.name', 'Aardvark QA');
         $this->getJson('/api/admin/categories?sort=newest&per_page=100')
             ->assertOk()->assertJsonPath('data.0.name', 'Zyzzyva QA');
+    }
+
+    public function test_admin_site_setting_update_is_returned_by_public_api(): void
+    {
+        $this->getJson('/api/content/settings')->assertOk();
+        $this->authenticateAdmin();
+
+        $this->getJson('/api/admin/settings')->assertOk()->assertJsonFragment(['key' => 'general.tagline']);
+        $update = $this->putJson('/api/admin/settings', [
+            'settings' => ['general.tagline' => 'A database-powered destination'],
+        ])->assertOk();
+        $this->assertSame('A database-powered destination', $update->json('settings')['general.tagline']);
+
+        $public = $this->getJson('/api/content/settings')->assertOk();
+        $this->assertSame('A database-powered destination', $public->json()['general.tagline']);
+        $this->assertDatabaseHas('audit_logs', ['entity_type' => 'site_settings', 'action' => 'updated']);
+    }
+
+    public function test_admin_content_update_is_immediately_returned_by_public_api(): void
+    {
+        $event = DB::table('events')->where('status', 'published')->first();
+        $this->getJson('/api/content/events')->assertOk();
+        $this->authenticateAdmin();
+
+        $this->putJson('/api/admin/events/'.$event->id, ['title' => 'Updated Public Event'])
+            ->assertOk()
+            ->assertJsonPath('title', 'Updated Public Event');
+
+        $this->getJson('/api/content/events')
+            ->assertOk()
+            ->assertJsonFragment(['id' => $event->id, 'title' => 'Updated Public Event']);
     }
 
     private function authenticateAdmin(): void

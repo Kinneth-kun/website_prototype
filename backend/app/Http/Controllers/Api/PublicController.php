@@ -21,6 +21,7 @@ class PublicController extends Controller
         $version=Cache::get('cms_content_version',1); $cacheKey='public-content:'.$version.':'.$resource.':'.sha1($request->getQueryString()??'');
         $content=Cache::remember($cacheKey,60,function() use($request,$resource){
         $query = DB::table($resource);
+        if ($resource === 'tenants') $query->select('trade_name', 'industry_name', 'company_address', 'approved_products', 'picture_of_branches', 'picture_of_menu');
         if ($resource === 'categories') $query->where('is_active', true);
         if (in_array($resource, ['tenants','leasing_spaces','events','promotions','services','highlights'], true)) {
             $query->whereNull('deleted_at');
@@ -36,7 +37,7 @@ class PublicController extends Controller
             $column = $resource === 'tenants' || $resource === 'services' ? 'name' : 'title';
             $query->where($column, 'like', '%'.$request->string('search').'%');
         }
-        $alphabeticalColumns = ['tenants'=>'name', 'categories'=>'name', 'floors'=>'name'];
+        $alphabeticalColumns = ['tenants'=>'trade_name', 'categories'=>'name', 'floors'=>'name'];
         if (isset($alphabeticalColumns[$resource])) $query->orderBy($alphabeticalColumns[$resource]);
         elseif (\Illuminate\Support\Facades\Schema::hasColumn($resource, 'display_order')) $query->orderBy('display_order');
         return $query->orderBy($resource === 'mall_hours' ? 'day_of_week' : 'id')->get();

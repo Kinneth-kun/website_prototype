@@ -25,7 +25,9 @@ class CmsSeeder extends Seeder
         $tenants = json_decode(file_get_contents(database_path('seeders/data/tenants.json')), true, flags: JSON_THROW_ON_ERROR);
         foreach ($tenants as $tenant) {
             DB::table('tenants')->updateOrInsert(['slug'=>Str::slug($tenant['name'])], [
-                'name'=>$tenant['name'], 'category_id'=>$categoryIds[$tenant['category']]??null,
+                'name'=>$tenant['name'], 'trade_name'=>$tenant['name'], 'industry_name'=>$tenant['category'],
+                'company_address'=>$tenant['location_detail'], 'nature_of_business'=>$tenant['description'],
+                'picture_of_branches'=>$tenant['logo_url'], 'category_id'=>$categoryIds[$tenant['category']]??null,
                 'floor_id'=>$floorIds[$tenant['floor']]??null, 'location_detail'=>$tenant['location_detail'],
                 'lease_type'=>$tenant['lease_type'], 'logo_url'=>$tenant['logo_url'],
                 'description'=>$tenant['description'], 'status'=>$tenant['status'],

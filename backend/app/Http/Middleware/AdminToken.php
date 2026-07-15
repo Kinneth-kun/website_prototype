@@ -16,7 +16,9 @@ class AdminToken
         $token = $request->bearerToken();
         $session = $token ? DB::table('admin_sessions')
             ->where('token_hash', hash('sha256', $token))->where('expires_at', '>', now())->first() : null;
-        $idleMinutes = max(5, (int) env('ADMIN_IDLE_TIMEOUT_MINUTES', 30));
+        $idleMinutes = $session && $session->remembered
+            ? max(1440, (int) env('ADMIN_REMEMBER_IDLE_TIMEOUT_DAYS', 7) * 1440)
+            : max(5, (int) env('ADMIN_IDLE_TIMEOUT_MINUTES', 30));
         if ($session && $session->last_used_at && Carbon::parse($session->last_used_at)->lte(now()->subMinutes($idleMinutes))) {
             DB::table('admin_sessions')->where('id', $session->id)->delete();
             $session = null;

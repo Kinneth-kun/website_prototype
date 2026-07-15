@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\AdminResourceController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\MediaController;
 use App\Http\Controllers\Api\PublicController;
+use App\Http\Controllers\Api\SiteSettingsController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/content/settings', [PublicController::class, 'settings']);
@@ -22,6 +23,8 @@ Route::middleware('admin.token')->prefix('admin')->group(function () {
     Route::post('/media', [MediaController::class, 'store']);
     Route::put('/media/{id}', [MediaController::class, 'update']);
     Route::delete('/media/{id}', [MediaController::class, 'destroy']);
+    Route::get('/settings', [SiteSettingsController::class, 'index']);
+    Route::put('/settings', [SiteSettingsController::class, 'update']);
     Route::get('/{resource}', [AdminResourceController::class, 'index']);
     Route::post('/{resource}', [AdminResourceController::class, 'store']);
     Route::get('/{resource}/{id}', [AdminResourceController::class, 'show']);
