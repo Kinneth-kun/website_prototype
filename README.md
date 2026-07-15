@@ -100,13 +100,18 @@ Backups are private files under `backend/storage/app/private/backups`. Copy them
 ## Production checklist
 
 - Set `APP_ENV=production`, `APP_DEBUG=false`, and the public HTTPS `APP_URL`.
+- Serve Laravel with the web-server document root set to `backend/public`; never expose the repository root, `.env`, `storage`, database files, logs, backups, or source maps.
+- Keep the repository private, deploy with a read-only service account, restrict SSH and hosting access with MFA, and grant the web process write access only to Laravel's required `storage` and cache directories.
 - Set frontend `VITE_SITE_URL` to the final HTTPS website URL before building; the build generates `sitemap.xml` and `robots.txt` automatically.
 - Set a long, unique administrator password and rotate the current development password.
 - Restrict `FRONTEND_URLS` to the real HTTPS frontend origin.
+- Set `ADMIN_IDLE_TIMEOUT_MINUTES` (30 or less is recommended), keep `ADMIN_SESSION_HOURS` short, and never put secrets in any `VITE_*` variable because those values are public in the browser bundle.
 - Use a dedicated MySQL user with access only to this database.
+- Restrict the database to the private network, require encrypted connections, encrypt disks and off-site backups, and protect hosting/database accounts with MFA.
 - Run `php artisan optimize`, `npm run build`, a queue worker, and the scheduler.
 - Configure HTTPS, response compression, security headers, and long-lived caching for versioned assets at the web server or CDN.
 - Set up database/off-site backups, uptime checks for `/up`, and application error monitoring.
+- Run `composer audit --locked` and `npm audit` during every deployment, enable automated dependency updates, and schedule independent penetration tests.
 - Update canonical URLs and submit the deployed sitemap through the search-engine webmaster tools after the final domain is known.
 
 ## Deploying the frontend to Vercel

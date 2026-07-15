@@ -42,6 +42,9 @@ class AuthController extends Controller
             if (! $challenge || $challenge->consumed_at || now()->greaterThan($challenge->expires_at) || $challenge->attempts >= 5) {
                 return response()->json(['message' => 'This verification code is invalid or has expired.'], 422);
             }
+            if (! hash_equals((string) $challenge->ip_address, (string) $request->ip())) {
+                return response()->json(['message' => 'This verification code is invalid or has expired.'], 422);
+            }
             if (! hash_equals($challenge->otp_hash, $this->hashOtp($data['code']))) {
                 DB::table('admin_login_otps')->where('id', $challenge->id)->increment('attempts');
                 return response()->json(['message' => 'This verification code is invalid or has expired.'], 422);
@@ -81,7 +84,7 @@ class AuthController extends Controller
         $challengeId = (string) Str::uuid(); $code = (string) random_int(100000, 999999);
         DB::table('admin_login_otps')->insert(['id'=>$challengeId,'user_id'=>$user->id,'otp_hash'=>$this->hashOtp($code),'attempts'=>0,'ip_address'=>$request->ip(),'expires_at'=>now()->addMinutes(10),'created_at'=>now(),'updated_at'=>now()]);
         try { Mail::to($user->email)->send(new AdminLoginOtp($code)); }
-        catch (\Throwable $exception) { DB::table('admin_login_otps')->where('id', $challengeId)->delete(); report($exception); return response()->json(['message'=>'The verification email could not be sent. Check the Gmail SMTP configuration and try again.'],503); }
+        catch (\Throwable $exception) { DB::table('admin_login_otps')->where('id', $challengeId)->delete(); report($exception); return response()->json(['message'=>'The verification email could not be sent. Please try again later.'],503); }
         return response()->json(['otp_required'=>true,'challenge_id'=>$challengeId,'expires_in'=>600,'resend_after'=>60]);
     }
 }

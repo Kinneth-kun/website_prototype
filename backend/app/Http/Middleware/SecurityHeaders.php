@@ -15,7 +15,13 @@ class SecurityHeaders
         $response->headers->set('X-Frame-Options','DENY');
         $response->headers->set('Referrer-Policy','strict-origin-when-cross-origin');
         $response->headers->set('Permissions-Policy','camera=(), microphone=(), geolocation=()');
-        if(app()->environment('production')) $response->headers->set('Strict-Transport-Security','max-age=31536000; includeSubDomains');
+        $response->headers->set('Cross-Origin-Opener-Policy','same-origin');
+        $response->headers->set('Cross-Origin-Resource-Policy','same-site');
+        if ($request->is('api/admin/*')) {
+            $response->headers->set('Cache-Control', 'no-store, private');
+            $response->headers->set('Pragma', 'no-cache');
+        }
+        if(app()->environment('production')) $response->headers->set('Strict-Transport-Security','max-age=63072000; includeSubDomains; preload');
         return $response;
     }
 }

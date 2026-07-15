@@ -43,6 +43,35 @@ class CmsApiTest extends TestCase
         $this->postJson('/api/admin/verify-otp', ['challenge_id'=>$login->json('challenge_id'),'code'=>$code])->assertUnprocessable();
     }
 
+    public function test_otp_cannot_be_redeemed_from_a_different_ip_address(): void
+    {
+        Mail::fake();
+        $user = User::create(['name'=>'Test Administrator','email'=>'ip-admin@example.test','password'=>Hash::make('Strong-test-password-123!'),'role'=>'super_admin','status'=>'active']);
+        $login = $this->withServerVariables(['REMOTE_ADDR' => '192.0.2.10'])
+            ->postJson('/api/admin/login', ['email'=>$user->email,'password'=>'Strong-test-password-123!']);
+        $code = null;
+        Mail::assertSent(AdminLoginOtp::class, function (AdminLoginOtp $mail) use (&$code) { $code = $mail->code; return true; });
+
+        $this->withServerVariables(['REMOTE_ADDR' => '192.0.2.11'])
+            ->postJson('/api/admin/verify-otp', ['challenge_id'=>$login->json('challenge_id'),'code'=>$code])
+            ->assertUnprocessable()
+            ->assertJsonMissing(['token']);
+    }
+
+    public function test_idle_admin_session_is_revoked_and_admin_responses_are_not_cached(): void
+    {
+        config(['app.env' => 'production']);
+        $token=Str::random(80);
+        $user=User::create(['name'=>'Idle Admin','email'=>'idle@example.test','password'=>Hash::make('password'),'role'=>'super_admin','status'=>'active']);
+        DB::table('admin_sessions')->insert(['id'=>(string)Str::uuid(),'user_id'=>$user->id,'token_hash'=>hash('sha256',$token),'last_used_at'=>now()->subHour(),'expires_at'=>now()->addHour(),'created_at'=>now()->subHour(),'updated_at'=>now()->subHour()]);
+
+        $this->withToken($token)->getJson('/api/admin/me')
+            ->assertUnauthorized()
+            ->assertHeader('Cache-Control', 'no-store, private')
+            ->assertHeader('X-Content-Type-Options', 'nosniff');
+        $this->assertDatabaseMissing('admin_sessions', ['token_hash'=>hash('sha256',$token)]);
+    }
+
     public function test_public_inquiry_is_stored(): void
     {
         $this->postJson('/api/inquiries', ['inquiry_type'=>'Leasing','name'=>'Sample User','email'=>'user@example.com','message'=>'I would like to ask about an available retail space.'])->assertCreated()->assertJsonStructure(['reference_number']);

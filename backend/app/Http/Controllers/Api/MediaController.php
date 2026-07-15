@@ -27,9 +27,11 @@ class MediaController extends Controller
             'alt_text' => ['nullable', 'string', 'max:255'],
         ]);
         $file = $data['file'];
+        [$width, $height] = @getimagesize($file->getRealPath()) ?: [null, null];
+        abort_if(! $width || ! $height, 422, 'The uploaded file is not a valid image.');
+        abort_if($width > 10000 || $height > 10000 || ($width * $height) > 40000000, 422, 'The image dimensions are too large.');
         $base = Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) ?: 'image';
         $path = $file->storeAs('media/'.now()->format('Y/m'), $base.'-'.Str::lower(Str::random(8)).'.'.$file->extension(), 'public');
-        [$width, $height] = @getimagesize($file->getRealPath()) ?: [null, null];
         $id = DB::table('media')->insertGetId([
             'uploaded_by' => $request->user()->id,
             'name' => $file->getClientOriginalName(),
