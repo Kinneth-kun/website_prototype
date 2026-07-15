@@ -80,8 +80,8 @@ class AuthController extends Controller
         DB::table('admin_login_otps')->where('user_id', $user->id)->whereNull('consumed_at')->delete();
         $challengeId = (string) Str::uuid(); $code = (string) random_int(100000, 999999);
         DB::table('admin_login_otps')->insert(['id'=>$challengeId,'user_id'=>$user->id,'otp_hash'=>$this->hashOtp($code),'attempts'=>0,'ip_address'=>$request->ip(),'expires_at'=>now()->addMinutes(10),'created_at'=>now(),'updated_at'=>now()]);
-        try { Mail::to($user->email)->queue(new AdminLoginOtp($code)); }
-        catch (\Throwable $exception) { DB::table('admin_login_otps')->where('id', $challengeId)->delete(); report($exception); return response()->json(['message'=>'The verification email could not be queued. Check the mail configuration and try again.'],503); }
+        try { Mail::to($user->email)->send(new AdminLoginOtp($code)); }
+        catch (\Throwable $exception) { DB::table('admin_login_otps')->where('id', $challengeId)->delete(); report($exception); return response()->json(['message'=>'The verification email could not be sent. Check the Gmail SMTP configuration and try again.'],503); }
         return response()->json(['otp_required'=>true,'challenge_id'=>$challengeId,'expires_in'=>600,'resend_after'=>60]);
     }
 }

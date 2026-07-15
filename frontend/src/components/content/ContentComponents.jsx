@@ -10,10 +10,12 @@ export function TenantGrid({ tenants }) { return <div className="card-grid">{ten
 export function ContentCards({ resource }) { const [items,loading]=useContent(resource); if (loading) return <Loading/>; return <div className="content-grid">{items.map(item => <article key={item.id}>{item.cover_image_url && <img src={assetUrl(item.cover_image_url)} alt={item.title||item.name||""} loading="lazy" decoding="async"/>}<span>{item.space_type||item.venue||item.location_detail||item.status}</span><h3>{item.title||item.name}</h3><p>{item.summary||item.description}</p>{item.action_url && <a className="text-link card-action" href={item.action_url} target="_blank" rel="noreferrer">{item.action_label||"Learn more"} &rarr;</a>}</article>)}</div>; }
 
 export function HoursStrip() {
-  const [hours] = useContent("mall_hours"); const settings=useSettings(),now=new Date(); const today=hours.find(h=>+h.day_of_week===now.getDay());
-  const minutes=now.getHours()*60+now.getMinutes(), opening=today?+today.opening_time.slice(0,2)*60:0, closing=today?+today.closing_time.slice(0,2)*60:0;
-  const open=today&&!today.is_closed&&minutes>=opening&&minutes<closing;
-  return <section className="hours-strip"><div><span>Mall hours</span><strong>{settings["hours.title"]||"Open daily for shopping, dining, services, and entertainment."}</strong><p>{settings["hours.schedule"]||"10:00 AM–9:00 PM Monday–Thursday · 9:00 AM–9:00 PM Friday–Sunday"}</p></div><div><span>Mall status</span><strong>{open?"Open now":"Closed"}</strong><p>{today?`${today.opening_time.slice(0,5)} - ${today.closing_time.slice(0,5)}`:"Loading..."}</p></div></section>;
+  const [hours] = useContent("mall_hours"); const settings=useSettings(),[now,setNow]=useState(()=>new Date());
+  useEffect(()=>{const timer=setInterval(()=>setNow(new Date()),1000);return()=>clearInterval(timer)},[]);
+  const timeZone="Asia/Manila",weekdayName=new Intl.DateTimeFormat("en-US",{timeZone,weekday:"long"}).format(now),weekdays=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],dayIndex=weekdays.indexOf(weekdayName),today=hours.find(h=>+h.day_of_week===dayIndex);
+  const parts=Object.fromEntries(new Intl.DateTimeFormat("en-US",{timeZone,hour:"2-digit",minute:"2-digit",second:"2-digit",hourCycle:"h23"}).formatToParts(now).map(part=>[part.type,part.value])),minutes=Number(parts.hour)*60+Number(parts.minute),opening=today?+today.opening_time.slice(0,2)*60:0,closing=today?+today.closing_time.slice(0,2)*60:0;
+  const open=today&&!today.is_closed&&minutes>=opening&&minutes<closing,liveDate=new Intl.DateTimeFormat("en-PH",{timeZone,weekday:"long",month:"long",day:"numeric",year:"numeric"}).format(now),liveTime=new Intl.DateTimeFormat("en-PH",{timeZone,hour:"numeric",minute:"2-digit",second:"2-digit",hour12:true}).format(now);
+  return <section className="hours-strip"><div><span>Mall hours</span><strong>{settings["hours.title"]||"Open daily for shopping, dining, services, and entertainment."}</strong><p>{settings["hours.schedule"]||"10:00 AM–9:00 PM Monday–Thursday · 9:00 AM–9:00 PM Friday–Sunday"}</p></div><div><span>Mall status</span><strong>{open?"Open now":"Closed"}</strong><time className="mall-live-time" dateTime={now.toISOString()}><b>{liveTime}</b><small>{liveDate} · Philippine Time</small></time></div></section>;
 }
 
 export function MediaFeature({ item }) {

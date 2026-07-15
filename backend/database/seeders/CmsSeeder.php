@@ -68,7 +68,30 @@ class CmsSeeder extends Seeder
             ['Food and Beverage Space for Dining Concepts','Dining','Space suited for cafes, quick-service dining, dessert shops, snack counters and grab-and-go concepts.','images/mall_images/002.webp',['Repeat-visit potential','Compact operations','Airport-adjacent demand']],
             ['Service-ready Unit for Everyday Customer Needs','Service','Practical mall unit for wellness, beauty, clinics, repairs, payment centers and professional services.','images/mall_images/003.webp',['Flexible fit-out','Useful for daily errands','Managed commercial environment']],
         ];
-        foreach($spaces as $i=>[$title,$type,$description,$image,$features]) DB::table('leasing_spaces')->updateOrInsert(['slug'=>Str::slug($title)], ['title'=>$title,'space_type'=>$type,'description'=>$description,'features'=>json_encode($features),'availability_status'=>'available','cover_image_url'=>$image,'is_featured'=>true,'display_order'=>$i,'published_at'=>now(),'created_at'=>now(),'updated_at'=>now()]);
+        foreach($spaces as $i=>[$title,$type,$description,$image,$features]) DB::table('leasing_spaces')->updateOrInsert(['slug'=>Str::slug($title)], [
+            'branch_id'=>1,
+            'unit_code'=>'ICM-LS-'.str_pad((string) ($i + 1), 3, '0', STR_PAD_LEFT),
+            'unit_name'=>$title,
+            'floor_level'=>'Ground Floor',
+            'location_description'=>$description,
+            'floor_area_sqm'=>null,
+            'base_rate_sqm'=>null,
+            'cusa_rate_sqm'=>null,
+            'ads_fee_sqm'=>null,
+            'is_vatable'=>false,
+            'status'=>'available',
+            'title'=>$title,
+            'space_type'=>$type,
+            'description'=>$description,
+            'features'=>json_encode($features),
+            'availability_status'=>'available',
+            'cover_image_url'=>$image,
+            'is_featured'=>true,
+            'display_order'=>$i,
+            'published_at'=>now(),
+            'created_at'=>now(),
+            'updated_at'=>now(),
+        ]);
 
         $services = [['Customer Support','Questions, directions and visit assistance from the mall team.','help-circle'],['Parking Access','Convenient arrival for shoppers, tenants and business guests.','car'],['Maintenance','Property upkeep for a clean and professional setting.','wrench'],['Leasing Assistance','Guidance for availability, fit-out needs and site visits.','building'],['Marketing Assistance','Support for events, activities and brand collaborations.','megaphone'],['Cinema','Movie schedules, screenings and cinema information.','film']];
         foreach($services as $i=>[$name,$description,$icon]) DB::table('services')->updateOrInsert(['slug'=>Str::slug($name)], ['name'=>$name,'description'=>$description,'icon'=>$icon,'cover_image_url'=>$name==='Cinema'?'images/general_images/cinema_background.webp':'images/general_images/services_background.webp','action_label'=>$name==='Cinema'?'View cinema schedule':null,'action_url'=>$name==='Cinema'?'https://cinedesk-icm.online/':null,'status'=>'active','is_featured'=>true,'display_order'=>$i,'published_at'=>now(),'created_at'=>now(),'updated_at'=>now()]);

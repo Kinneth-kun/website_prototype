@@ -14,7 +14,7 @@ export function SiteLayout({ children, variant = "default" }) {
   const location = useLocation();
   const settings = useSettings();
   const parseLinks=(key,fallback)=>{try{return JSON.parse(settings[key])||fallback}catch{return fallback}};
-  const primaryLinks=parseLinks("navigation.primary",publicNavigation),mallLinks=parseLinks("navigation.mall",mallNavigation);
+  const primaryLinks=parseLinks("navigation.primary",publicNavigation),savedMallLinks=parseLinks("navigation.mall",mallNavigation),mallLinks=savedMallLinks.some(([to])=>to==="/visit-planner")?savedMallLinks:[...savedMallLinks,["/visit-planner","Visit Planner"]];
   usePageEffects();
   useEffect(()=>{setOpen(false)},[location.pathname]);
   return <>
@@ -23,7 +23,7 @@ export function SiteLayout({ children, variant = "default" }) {
       <Link className="brand" to="/"><img src={assetUrl(settings["general.logo_url"]||"images/general_images/icm_logo_transparent.png")} alt="Island Central Mactan"/></Link>
       <button className="menu" onClick={() => setOpen(!open)} aria-expanded={open} aria-label="Toggle navigation"><Menu/></button>
       <nav className={open ? "open" : ""} aria-label="Primary navigation">{primaryLinks.map(([to,label]) => to === "/mall" ?
-        <div className={`nav-dropdown${["/mall","/directory","/events"].includes(location.pathname) ? " active" : ""}`} key={to}>
+        <div className={`nav-dropdown${["/mall","/directory","/events","/visit-planner"].includes(location.pathname) ? " active" : ""}`} key={to}>
           <NavLink className="nav-parent" to={to} aria-haspopup="true" onClick={() => setOpen(false)}>{label}</NavLink>
           <div className="nav-menu" aria-label="Mall pages" role="menu">{mallLinks.map(([childTo,childLabel]) => <NavLink role="menuitem" key={childTo} to={childTo} onClick={() => setOpen(false)}>{childLabel}</NavLink>)}</div>
         </div> : <NavLink className={to === "/inquire" ? "nav-cta" : undefined} key={to} to={to} onClick={() => setOpen(false)}>{label}</NavLink>)}</nav>

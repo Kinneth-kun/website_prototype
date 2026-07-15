@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
+use App\Notifications\NewInquiryReceived;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Str;
 
 class PublicController extends Controller
 {
@@ -33,7 +36,9 @@ class PublicController extends Controller
             $column = $resource === 'tenants' || $resource === 'services' ? 'name' : 'title';
             $query->where($column, 'like', '%'.$request->string('search').'%');
         }
-        if (\Illuminate\Support\Facades\Schema::hasColumn($resource, 'display_order')) $query->orderBy('display_order');
+        $alphabeticalColumns = ['tenants'=>'name', 'categories'=>'name', 'floors'=>'name'];
+        if (isset($alphabeticalColumns[$resource])) $query->orderBy($alphabeticalColumns[$resource]);
+        elseif (\Illuminate\Support\Facades\Schema::hasColumn($resource, 'display_order')) $query->orderBy('display_order');
         return $query->orderBy($resource === 'mall_hours' ? 'day_of_week' : 'id')->get();
         });
         return response($content)
@@ -56,7 +61,18 @@ class PublicController extends Controller
         ]);
         $data['reference_number'] = 'ICM-'.now()->format('Ymd').'-'.strtoupper(Str::random(6));
         $data['created_at'] = $data['updated_at'] = now();
-        DB::table('inquiries')->insert($data);
+
+        DB::transaction(function () use (&$data) {
+            $data['id'] = DB::table('inquiries')->insertGetId($data);
+
+            $administrators = User::query()
+                ->where('status', 'active')
+                ->whereIn('role', ['super_admin', 'editor'])
+                ->get();
+
+            Notification::send($administrators, new NewInquiryReceived($data));
+        });
+
         return response()->json(['message' => 'Inquiry received.', 'reference_number' => $data['reference_number']], 201);
     }
 }

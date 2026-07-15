@@ -1,0 +1,242 @@
+.admin-notification-center{
+  position:relative;
+  z-index:80;
+  display:inline-flex;
+  font-family:inherit;
+}
+
+.admin-notification-trigger{
+  position:relative;
+  width:46px;
+  min-width:46px;
+  height:46px;
+  min-height:46px;
+  display:grid;
+  place-items:center;
+  padding:0;
+  color:#173f47;
+  background:rgba(255,255,255,.72);
+  border:1px solid rgba(27,91,99,.14);
+  border-radius:50%;
+  box-shadow:0 9px 25px rgba(17,66,73,.1),inset 0 1px 0 rgba(255,255,255,.85);
+  backdrop-filter:blur(14px);
+  cursor:pointer;
+  transition:transform .18s ease,background .18s ease,box-shadow .18s ease;
+}
+
+.admin-notification-trigger:hover,.admin-notification-trigger.is-open{
+  color:#057f8c;
+  background:rgba(255,255,255,.94);
+  transform:translateY(-1px);
+  box-shadow:0 13px 30px rgba(17,66,73,.14),inset 0 1px 0 #fff;
+}
+
+.admin-notification-trigger:focus-visible,.admin-notification-panel button:focus-visible,.admin-notification-panel a:focus-visible{
+  outline:3px solid rgba(0,150,162,.25);
+  outline-offset:2px;
+}
+
+.admin-notification-trigger>svg{width:21px;height:21px;stroke-width:2.1}
+
+.admin-notification-badge{
+  position:absolute;
+  top:-3px;
+  right:-4px;
+  min-width:20px;
+  height:20px;
+  display:grid;
+  place-items:center;
+  padding:0 5px;
+  color:#fff;
+  background:#d93932;
+  border:2px solid #edf4f2;
+  border-radius:999px;
+  font-size:.65rem;
+  font-weight:850;
+  line-height:1;
+}
+
+.admin-notification-panel{
+  position:absolute;
+  top:calc(100% + 12px);
+  right:0;
+  width:min(420px,calc(100vw - 32px));
+  max-height:min(650px,calc(100vh - 100px));
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  color:#18383f;
+  background:linear-gradient(145deg,rgba(255,255,255,.96),rgba(240,248,247,.93));
+  border:1px solid rgba(27,91,99,.15);
+  border-radius:18px;
+  box-shadow:0 28px 85px rgba(2,35,41,.24),inset 0 1px 0 #fff;
+  backdrop-filter:blur(22px) saturate(135%);
+  animation:admin-notification-open .18s ease-out;
+}
+
+@keyframes admin-notification-open{
+  from{opacity:0;transform:translateY(-7px) scale(.985)}
+}
+
+.admin-notification-panel>header{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:18px;
+  padding:21px 21px 16px;
+  border-bottom:1px solid rgba(27,91,99,.1);
+}
+
+.admin-notification-panel h2{margin:0;color:#133239;font-family:inherit;font-size:1.35rem;letter-spacing:-.02em}
+.admin-notification-panel header p{margin:4px 0 0;color:#698087;font-size:.78rem}
+
+.admin-notification-panel .admin-notification-read-all{
+  min-height:36px;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:7px 9px;
+  color:#067e8a;
+  background:transparent;
+  border:0;
+  border-radius:9px;
+  font-size:.77rem;
+  font-weight:750;
+  white-space:nowrap;
+  cursor:pointer;
+}
+
+.admin-notification-read-all:hover:not(:disabled){background:rgba(0,140,153,.08)}
+.admin-notification-read-all:disabled{opacity:.43;cursor:default}
+.admin-notification-read-all svg{width:16px;height:16px}
+
+.admin-notification-error{
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  align-items:center;
+  gap:9px;
+  margin:12px 14px 0;
+  padding:10px 11px;
+  color:#8d2923;
+  background:rgba(255,239,237,.85);
+  border:1px solid rgba(180,35,24,.18);
+  border-radius:10px;
+  font-size:.76rem;
+  line-height:1.4;
+}
+
+.admin-notification-error svg{width:17px;height:17px}
+.admin-notification-error button{min-height:32px;padding:5px 8px;color:inherit;background:rgba(255,255,255,.6);border:0;border-radius:7px;font-weight:750;cursor:pointer}
+
+.admin-notification-list{min-height:160px;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:rgba(38,96,104,.25) transparent}
+
+.admin-notification-item{
+  position:relative;
+  min-height:92px;
+  display:grid;
+  grid-template-columns:42px minmax(0,1fr) 30px;
+  gap:12px;
+  align-items:start;
+  padding:14px 13px 14px 17px;
+  border-bottom:1px solid rgba(27,91,99,.08);
+  transition:background .16s ease;
+}
+
+.admin-notification-item:hover{background:rgba(255,255,255,.75)}
+.admin-notification-item.is-unread{background:linear-gradient(90deg,rgba(217,245,246,.78),rgba(245,251,250,.62))}
+.admin-notification-item.is-unread:hover{background:linear-gradient(90deg,rgba(207,241,243,.9),rgba(255,255,255,.82))}
+
+.admin-notification-icon{
+  width:42px;
+  height:42px;
+  display:grid;
+  place-items:center;
+  color:#087f8b;
+  background:linear-gradient(145deg,#e0f5f3,#cceceb);
+  border-radius:50%;
+}
+
+.admin-notification-icon svg{width:19px;height:19px}
+
+.admin-notification-copy{
+  min-width:0;
+  min-height:44px;
+  display:grid;
+  gap:3px;
+  padding:0;
+  color:inherit;
+  background:transparent;
+  border:0;
+  border-radius:6px;
+  text-align:left;
+  text-decoration:none;
+  cursor:pointer;
+}
+
+.admin-notification-copy strong{overflow:hidden;color:#17383f;font-size:.88rem;line-height:1.35;text-overflow:ellipsis;white-space:nowrap}
+.admin-notification-copy>span{display:-webkit-box;overflow:hidden;color:#5e747a;font-size:.78rem;line-height:1.42;-webkit-box-orient:vertical;-webkit-line-clamp:2}
+.admin-notification-copy time{margin-top:2px;color:#087f8b;font-size:.7rem;font-weight:700}
+.admin-notification-item:not(.is-unread) .admin-notification-copy time{color:#829398}
+
+.admin-notification-read-one{
+  width:30px;
+  min-width:30px;
+  height:30px;
+  min-height:30px;
+  display:grid;
+  place-items:center;
+  padding:0;
+  color:#078792;
+  background:transparent;
+  border:0;
+  border-radius:50%;
+  cursor:pointer;
+  opacity:0;
+  transition:opacity .16s ease,background .16s ease;
+}
+
+.admin-notification-item:hover .admin-notification-read-one,.admin-notification-read-one:focus-visible{opacity:1}
+.admin-notification-read-one:hover{background:rgba(0,140,153,.11)}
+.admin-notification-read-one:disabled{opacity:.45}
+.admin-notification-read-one svg{width:16px;height:16px}
+
+/* Keep the compact notification controls from inheriting the global admin
+   44px action-button minimum while preserving a 46px accessible bell target. */
+.admin .admin-notification-panel .admin-notification-read-all{min-height:36px}
+.admin .admin-notification-error button{min-height:32px}
+.admin .admin-notification-read-one{min-height:30px}
+.admin .admin-notification-panel>footer button{min-height:38px}
+
+.admin-notification-empty{min-height:230px;display:grid;place-items:center;align-content:center;gap:7px;padding:30px;text-align:center}
+.admin-notification-empty>span{width:54px;height:54px;display:grid;place-items:center;margin-bottom:5px;color:#6b9da1;background:rgba(0,140,153,.08);border-radius:50%}
+.admin-notification-empty svg{width:25px;height:25px}
+.admin-notification-empty strong{font-size:.95rem}
+.admin-notification-empty p{max-width:260px;margin:0;color:#6e8388;font-size:.78rem;line-height:1.5}
+
+.admin-notification-skeleton{height:92px;display:grid;grid-template-columns:42px 1fr;gap:10px;padding:15px 17px;border-bottom:1px solid rgba(27,91,99,.07)}
+.admin-notification-skeleton i{grid-row:1/3;width:42px;height:42px;background:#e5eeec;border-radius:50%}
+.admin-notification-skeleton span{height:12px;background:linear-gradient(90deg,#e5eeec,#f3f7f6,#e5eeec);background-size:200% 100%;border-radius:7px;animation:admin-notification-shimmer 1.2s infinite}
+.admin-notification-skeleton span:last-child{width:72%;height:10px}
+
+@keyframes admin-notification-shimmer{to{background-position:-200% 0}}
+
+.admin-notification-panel>footer{padding:9px;border-top:1px solid rgba(27,91,99,.1);background:rgba(247,251,250,.76)}
+.admin-notification-panel>footer button{width:100%;min-height:38px;display:flex;align-items:center;justify-content:center;gap:7px;padding:7px;color:#47656b;background:transparent;border:0;border-radius:9px;font-size:.76rem;font-weight:700;cursor:pointer}
+.admin-notification-panel>footer button:hover:not(:disabled){color:#087f8b;background:rgba(0,140,153,.07)}
+.admin-notification-panel>footer button:disabled{opacity:.6}
+.admin-notification-panel>footer svg{width:15px;height:15px}
+.admin-notification-panel .is-spinning{animation:admin-notification-spin .8s linear infinite}
+
+@keyframes admin-notification-spin{to{transform:rotate(360deg)}}
+
+@media(max-width:580px){
+  .admin-notification-panel{position:fixed;top:74px;right:10px;left:10px;width:auto;max-height:calc(100vh - 84px)}
+  .admin-notification-panel>header{padding:18px 16px 14px}
+  .admin-notification-item{padding-inline:14px 10px}
+  .admin-notification-read-one{opacity:1}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .admin-notification-panel,.admin-notification-skeleton span,.admin-notification-panel .is-spinning{animation:none}
+  .admin-notification-trigger{transition:none}
+}

@@ -1,9 +1,10 @@
 <?php
 
+use App\Http\Controllers\Api\AdminNotificationController;
 use App\Http\Controllers\Api\AdminResourceController;
 use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\PublicController;
 use App\Http\Controllers\Api\MediaController;
+use App\Http\Controllers\Api\PublicController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/content/settings', [PublicController::class, 'settings']);
@@ -14,6 +15,9 @@ Route::post('/admin/verify-otp', [AuthController::class, 'verifyOtp'])->middlewa
 Route::post('/admin/resend-otp', [AuthController::class, 'resendOtp'])->middleware('throttle:3,10');
 Route::middleware('admin.token')->prefix('admin')->group(function () {
     Route::get('/me', [AuthController::class, 'me']); Route::post('/logout', [AuthController::class, 'logout']); Route::post('/change-password', [AuthController::class, 'changePassword'])->middleware('throttle:5,10');
+    Route::get('/notifications', [AdminNotificationController::class, 'index']);
+    Route::put('/notifications/read-all', [AdminNotificationController::class, 'markAllRead']);
+    Route::put('/notifications/{id}/read', [AdminNotificationController::class, 'markRead']);
     Route::get('/media', [MediaController::class, 'index']);
     Route::post('/media', [MediaController::class, 'store']);
     Route::put('/media/{id}', [MediaController::class, 'update']);

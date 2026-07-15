@@ -36,7 +36,7 @@ class CmsApiTest extends TestCase
         $login = $this->postJson('/api/admin/login', ['email'=>$user->email,'password'=>'Strong-test-password-123!'])
             ->assertOk()->assertJson(['otp_required'=>true]);
         $code = null;
-        Mail::assertQueued(AdminLoginOtp::class, function (AdminLoginOtp $mail) use (&$code) { $code = $mail->code; return true; });
+        Mail::assertSent(AdminLoginOtp::class, function (AdminLoginOtp $mail) use (&$code) { $code = $mail->code; return true; });
         $verification = $this->postJson('/api/admin/verify-otp', ['challenge_id'=>$login->json('challenge_id'),'code'=>$code])
             ->assertOk()->assertJsonStructure(['token','user']);
         $this->withToken($verification->json('token'))->getJson('/api/admin/tenants')->assertOk()->assertJsonStructure(['data']);
